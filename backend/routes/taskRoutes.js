@@ -2,6 +2,7 @@ import express from "express";
 import tasks from "../data/tasks.js";
 import multer from "multer";
 
+
 const router = express.Router();
 const storage = multer.diskStorage({
   destination: "uploads/",
@@ -208,5 +209,7 @@ router.post("/profile/avatar", upload.single("image"), (req, res) => {
     filename: req.file.filename,
   });
 })
+
+
 
 export default router;

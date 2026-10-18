@@ -3,6 +3,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import taskRoutes from "./routes/taskRoutes.js";
+import teamRoutes from "./routes/teamRoutes.js";
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -15,6 +16,7 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/tasks", taskRoutes);
+app.use("/api/team", teamRoutes);
 app.use("/uploads", express.static("uploads"));
 
 app.use((req, res) => {
