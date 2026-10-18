@@ -9,12 +9,15 @@ import Input from "../components/Input";
 
 const Team = () => {
   const [search, setSearch] = useState("");
-  const { data, error, loading } = useFetch(getAllTeam, []);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(5);
+  const [totalPages, setTotalPages] = useState(0);
+  const { data, error, loading } = useFetch(getAllTeam, [page, limit]);
   const { debouncedSearch } = useDebounce(search, 500);
   const [role, setRole] = useState("all");
   const [sort, setSort] = useState("default");
 
-  const filteredTeam = (data ?? []).filter((t) => {
+  const filteredTeam = (data?.Team ?? []).filter((t) => {
     return (
       (t.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
         t.email.toLowerCase().includes(debouncedSearch.toLowerCase())) &&
@@ -34,8 +37,26 @@ const Team = () => {
         });
 
   useEffect(() => {
+    if (data) {
+      setTotalPages(data.totalPages);
+    }
+  }, [data]);
+  useEffect(() => {
     console.log(data);
   }, [data]);
+
+  const handleNext = () => {
+    if (page < totalPages) {
+      const next = page + 1;
+      setPage(next);
+    }
+  };
+  const handlePrevious = () => {
+    if (page > 1) {
+      const previous = page - 1;
+      setPage(previous);
+    }
+  };
   return (
     <>
       <div className="flex">
@@ -64,8 +85,17 @@ const Team = () => {
         >
           <option value="default">Default</option>
           <option value="ascending">Acending</option>
-          <option value="Descending">Descending</option>
+          <option value="descending">Descending</option>
         </select>
+
+        <button onClick={handlePrevious} disabled={page === 1}>
+          Previous
+        </button>
+        <p>{page}</p>
+        <button onClick={handleNext} disabled={page === totalPages}>
+          Next
+        </button>
+        
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {data ? (
