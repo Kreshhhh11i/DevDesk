@@ -1,12 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Input from "../components/Input";
 import { createTasks, getAllTasks } from "../services/taskServices";
 import Card from "../components/Card";
 import { Link, useSearchParams } from "react-router-dom";
-import { AppleSpinner } from "../components/AppleSpinner";
 import useFetch from "../hooks/useFetch";
 import { useDebounce } from "../hooks/useDebounce";
 import { NotificationContext } from "../context/NotificationContext";
+import { AppleSpinner } from "../components/AppleSpinner";
 
 const Tasks = () => {
   // states
@@ -24,7 +24,7 @@ const Tasks = () => {
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [sortBy, setSortBy] = useState("default");
   const [currentPage, setCurrentPage] = useState(1);
-  const [limit, setLimit] = useState(5);
+  const [limit] = useState(5);
   const [totalPages, setTotalPages] = useState(0);
   const [searchParams, setSearchParams] = useSearchParams();
   const { data, error, loading } = useFetch(getAllTasks, [currentPage, limit]);
@@ -53,7 +53,7 @@ const Tasks = () => {
     low: 1,
   };
 
-  const sortedTask = filteredTask.sort((a, b) => {
+  const sortedTask = [...filteredTask].sort((a, b) => {
     if (sortBy === "priority") {
       return priorityNumber[b.priority] - priorityNumber[a.priority];
     } else if (sortBy === "dueDate") {
@@ -122,13 +122,19 @@ const Tasks = () => {
     const urlSort = searchParams.get("sort");
     const urlPage = searchParams.get("page");
     const validPriorities = ["low", "medium", "high"];
+    const validStatuses = ["all", "pending", "completed"];
+    const validSorts = ["default", "newest", "oldest", "priority", "dueDate"];
+    const pageNumber = Number(urlPage);
     setSearch(urlSearch || "");
-    setStatusFilter(urlStatus || "all");
+    setStatusFilter(validStatuses.includes(urlStatus) ? urlStatus : "all");
     setPriorityFilter(
       validPriorities.includes(urlPriority) ? urlPriority : "all",
     );
-    setSortBy(urlSort || "default");
-    setCurrentPage(Number(urlPage) || 1);
+    setSortBy(validSorts.includes(urlSort) ? urlSort : "default");
+
+    setCurrentPage(
+      Number.isInteger(pageNumber) && pageNumber > 0 ? pageNumber : 1,
+    );
   }, [searchParams]);
 
   const handleForm = (e) => {
@@ -166,6 +172,12 @@ const Tasks = () => {
     }
   };
 
+  if (loading) {
+    return <AppleSpinner />;
+  }
+  if (error) {
+    return <p>Failed to load tasks. Please try again.</p>;
+  }
   return (
     <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       <form onSubmit={handleSubmit}>

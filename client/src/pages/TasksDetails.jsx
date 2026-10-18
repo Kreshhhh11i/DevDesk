@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  getTaskById,
-  updateTask,
-  deleteTask,
-} from "../services/taskServices";
+import { getTaskById, updateTask, deleteTask } from "../services/taskServices";
 import TaskDetailsCard from "../components/TaskDetailsCard";
 import Input from "../components/Input";
 import { AppleSpinner } from "../components/AppleSpinner";
-
 
 const TasksDetails = () => {
   const navigate = useNavigate();
@@ -30,10 +25,6 @@ const TasksDetails = () => {
     category: "",
   });
 
-  useEffect(() => {
-    fetchData();
-  }, [id]);
-
   const fields = [
     "title",
     "description",
@@ -50,11 +41,15 @@ const TasksDetails = () => {
       setLoading(false);
       setError("");
     } catch (error) {
+      setTask(null);
       console.log(error);
       setError("Failed to fetch task");
       setLoading(false);
     }
   };
+  useEffect(() => {
+    fetchData();
+  }, [id]);
 
   const onEdit = () => {
     setisEditing(true);
@@ -68,7 +63,7 @@ const TasksDetails = () => {
     });
   };
 
-  const onCancel =() => {
+  const onCancel = () => {
     setisEditing(false);
   };
   const onSave = async () => {
@@ -98,8 +93,6 @@ const TasksDetails = () => {
       setIsDeleting(false);
     }
   };
-
- 
 
   return (
     <div>
@@ -157,7 +150,9 @@ const TasksDetails = () => {
           {isSaving === false ? (
             <button onClick={onSave}>Save</button>
           ) : (
-            <button disabled><AppleSpinner /></button>
+            <button disabled>
+              <AppleSpinner />
+            </button>
           )}
         </>
       ) : (
@@ -167,7 +162,6 @@ const TasksDetails = () => {
           onDelete={onDelete}
           isDeleting={isDeleting}
           deleteError={deleteError}
-          
         />
       )}
     </div>

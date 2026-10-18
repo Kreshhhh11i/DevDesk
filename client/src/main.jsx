@@ -6,14 +6,17 @@ import App from "./App.jsx";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
 import { NotificationProvider } from "./context/NotificationContext.jsx";
 import Toast from "./components/Toast.jsx";
+import ErrorBoundary from "./components/ErrorBound.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
       <ThemeProvider>
         <NotificationProvider>
-          <App />
-          <Toast />
+          <ErrorBoundary>
+            <App />
+            <Toast />
+          </ErrorBoundary>
         </NotificationProvider>
       </ThemeProvider>
     </AuthProvider>

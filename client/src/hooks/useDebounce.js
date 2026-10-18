@@ -10,7 +10,7 @@ export const useDebounce = (value, time) => {
         return () => {
             clearTimeout(delay);
         };
-    }, [value]);
+    }, [value,time]);
     return { debouncedSearch};
 
 }
