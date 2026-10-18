@@ -12,14 +12,26 @@ const Team = () => {
   const { data, error, loading } = useFetch(getAllTeam, []);
   const { debouncedSearch } = useDebounce(search, 500);
   const [role, setRole] = useState("all");
+  const [sort, setSort] = useState("default");
 
   const filteredTeam = (data ?? []).filter((t) => {
-  return (
-    (t.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      t.email.toLowerCase().includes(debouncedSearch.toLowerCase())) &&
-    (role === "all" || t.role.toLowerCase() === role)
-  );
-});
+    return (
+      (t.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        t.email.toLowerCase().includes(debouncedSearch.toLowerCase())) &&
+      (role === "all" || t.role.toLowerCase() === role)
+    );
+  });
+
+  const sortedTeam =
+    sort === "default"
+      ? filteredTeam
+      : [...filteredTeam].sort((a, b) => {
+          if (sort === "ascending") {
+            return a.name.localeCompare(b.name);
+          } else {
+            return b.name.localeCompare(a.name);
+          }
+        });
 
   useEffect(() => {
     console.log(data);
@@ -44,10 +56,20 @@ const Team = () => {
           <option value="agent">Agent</option>
           <option value="user">user</option>
         </select>
+        <select
+          value={sort}
+          onChange={(e) => {
+            setSort(e.target.value);
+          }}
+        >
+          <option value="default">Default</option>
+          <option value="ascending">Acending</option>
+          <option value="Descending">Descending</option>
+        </select>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {data ? (
-          filteredTeam.map((t) => {
+          sortedTeam.map((t) => {
             return (
               <Link key={t.id}>
                 <TeamCard
