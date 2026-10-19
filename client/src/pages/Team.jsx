@@ -95,13 +95,12 @@ const Team = () => {
         <button onClick={handleNext} disabled={page === totalPages}>
           Next
         </button>
-        
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {data ? (
           sortedTeam.map((t) => {
             return (
-              <Link key={t.id}>
+              <Link key={t.id} to={`/team/member/${t.id}`}>
                 <TeamCard
                   name={t.name}
                   email={t.email}

@@ -3,6 +3,7 @@ import ProtectedRoutes from "./ProtectedRoutes";
 import { lazy, Suspense } from "react";
 import { AppleSpinner } from "../components/AppleSpinner";
 import Team from "../pages/Team";
+import TeamDetails from "../pages/TeamDetails";
 
 const Dashboard = lazy(() => import("../pages/Dashboard"));
 const Profile = lazy(() => import("../pages/Profile"));
@@ -70,7 +71,8 @@ function AppRoutes() {
             </ProtectedRoutes>
           }
         />
-        <Route path="/members" element={<Team />}></Route>
+        <Route path="/team/members" element={<Team />}></Route>
+        <Route path="/team/member/:id" element={<TeamDetails />}></Route>
       </Routes>
     </Suspense>
   );
