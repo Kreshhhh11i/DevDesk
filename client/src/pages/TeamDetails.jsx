@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 import {
@@ -6,13 +7,20 @@ import {
   updateMember,
   deleteMember,
 } from "../services/teamService";
-import { TeamDetailsCard } from "../components/TeamDetailsCard";
+import TeamDetailsCard from "../components/TeamDetailsCard";
 
-const TeamDetails = () => {
-  const navigate = useNavigate();
+function TeamDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const { data, loading, error } = useFetch(getMemberById, [id]);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [message, setMessage] = useState("");
 
   const [formdata, setFormdata] = useState({
     name: "",
@@ -21,11 +29,7 @@ const TeamDetails = () => {
     status: "",
   });
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [onSave, setOnSave] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [message, setMessage] = useState("");
-
+  // Open edit form
   const handleEdit = () => {
     if (!data) return;
 
@@ -40,6 +44,7 @@ const TeamDetails = () => {
     setIsEditing(true);
   };
 
+  // Update form fields
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -49,57 +54,68 @@ const TeamDetails = () => {
     }));
   };
 
+  // Save updated member
   const handleSave = async () => {
-    setOnSave(true);
+    setIsSaving(true);
     setMessage("");
 
     try {
       await updateMember(id, formdata);
-
       setIsEditing(false);
-      // Refresh the page data to show the saved values.
       navigate(0);
     } catch (error) {
-      console.error("Failed to update member:", error);
-      setMessage("Failed to update member. Please try again.");
+      setMessage("Failed to update team member.");
     } finally {
-      setOnSave(false);
+      setIsSaving(false);
     }
   };
 
+  // Cancel editing
   const handleCancel = () => {
-    setFormdata({
-      name: data?.name ?? "",
-      email: data?.email ?? "",
-      role: data?.role ?? "",
-      status: data?.status ?? "",
-    });
-
     setIsEditing(false);
     setMessage("");
   };
 
+  // Open confirmation modal only
+  const openDeleteModal = () => {
+    setMessage("");
+    setIsDeleteModalOpen(true);
+  };
+
+  // Close confirmation modal
+  const closeDeleteModal = () => {
+    if (isDeleting) return;
+
+    setIsDeleteModalOpen(false);
+    setMessage("");
+  };
+
+  // Actually delete the member
   const handleDelete = async () => {
     setIsDeleting(true);
     setMessage("");
 
     try {
       await deleteMember(id);
+      setIsDeleteModalOpen(false);
+
+      // Change this path if your team listing route differs.
       navigate("/team/members");
     } catch (error) {
-      console.error("Failed to delete member:", error);
-      setMessage("Failed to delete member. Please try again.");
+      setMessage("Failed to delete team member. Please try again.");
     } finally {
       setIsDeleting(false);
     }
   };
 
-  if (loading) return <p>Loading member details...</p>;
-  if (error) return <p>Failed to load member details.</p>;
-  if (!data) return <p>Member not found.</p>;
+  if (loading) return <p>Loading team member...</p>;
+
+  if (error || !data) {
+    return <p>Failed to load team member.</p>;
+  }
 
   return (
-    <>
+    <div>
       <TeamDetailsCard
         name={data.name}
         email={data.email}
@@ -108,18 +124,49 @@ const TeamDetails = () => {
         isEditing={isEditing}
         formdata={formdata}
         onChange={handleChange}
-        edit={handleEdit}
-        save={handleSave}
-        cancel={handleCancel}
-        ondelete={handleDelete}
-        onTeam={() => navigate("/team/members")}
-        onSave={onSave}
-        isDeleting={isDeleting}
+        onEdit={handleEdit}
+        onSave={handleSave}
+        onCancel={handleCancel}
+        onDeleteClick={openDeleteModal}
+        isSaving={isSaving}
+        message={!isDeleteModalOpen ? message : ""}
       />
 
-      {message && <p>{message}</p>}
-    </>
+      {/* Delete confirmation modal */}
+      {isDeleteModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-modal-title"
+        >
+          <h2 id="delete-modal-title">Delete Team Member?</h2>
+
+          <p>
+            Are you sure you want to delete {data.name}?
+            This action cannot be undone.
+          </p>
+
+          {message && <p role="alert">{message}</p>}
+
+          <button
+            type="button"
+            onClick={closeDeleteModal}
+            disabled={isDeleting}
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={isDeleting}
+          >
+            {isDeleting ? "Deleting..." : "Confirm Delete"}
+          </button>
+        </div>
+      )}
+    </div>
   );
-};
+}
 
 export default TeamDetails;

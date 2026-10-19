@@ -1,6 +1,5 @@
-import React from "react";
 
-export const TeamDetailsCard = ({
+function TeamDetailsCard({
   name,
   email,
   role,
@@ -8,86 +7,85 @@ export const TeamDetailsCard = ({
   isEditing,
   formdata,
   onChange,
-  edit,
-  save,
-  cancel,
-  ondelete,
-  onTeam,
+  onEdit,
   onSave,
-  isDeleting,
-}) => {
+  onCancel,
+  onDeleteClick,
+  isSaving,
+  message,
+}) {
   return (
     <div>
       {isEditing ? (
-        <>
-          <div>
-            <label>Name</label>
+        <div>
+          <h2>Edit Team Member</h2>
+
+          <label>
+            Name
             <input
               name="name"
               value={formdata.name}
               onChange={onChange}
             />
-          </div>
+          </label>
 
-          <div>
-            <label>Email</label>
+          <label>
+            Email
             <input
               name="email"
               type="email"
               value={formdata.email}
               onChange={onChange}
             />
-          </div>
+          </label>
 
-          <div>
-            <label>Role</label>
-            <select
+          <label>
+            Role
+            <input
               name="role"
               value={formdata.role}
               onChange={onChange}
-            >
-              <option value="admin">Admin</option>
-              <option value="agent">Agent</option>
-              <option value="user">User</option>
-            </select>
-          </div>
+            />
+          </label>
 
-          <div>
-            <label>Status</label>
+          <label>
+            Status
             <select
               name="status"
               value={formdata.status}
               onChange={onChange}
             >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
             </select>
-          </div>
+          </label>
 
-          <button onClick={save} disabled={onSave}>
-            {onSave ? "Saving..." : "Save"}
+          <button onClick={onSave} disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save"}
           </button>
 
-          <button onClick={cancel} disabled={onSave}>
+          <button onClick={onCancel} disabled={isSaving}>
             Cancel
           </button>
-        </>
+        </div>
       ) : (
-        <>
-          <p>{name}</p>
-          <p>{email}</p>
-          <p>{role}</p>
-          <p>{status}</p>
+        <div>
+          <h2>{name}</h2>
+          <p>Email: {email}</p>
+          <p>Role: {role}</p>
+          <p>Status: {status}</p>
 
-          <button onClick={edit}>Edit</button>
+          <button onClick={onEdit}>Edit</button>
 
-          <button onClick={ondelete} disabled={isDeleting}>
-            {isDeleting ? "Deleting..." : "Delete"}
+          <button onClick={onDeleteClick}>
+            Delete
           </button>
-
-          <button onClick={onTeam}>Team</button>
-        </>
+        </div>
       )}
+
+      {message && <p role="alert">{message}</p>}
     </div>
   );
-};
+}
+
+export default TeamDetailsCard;
