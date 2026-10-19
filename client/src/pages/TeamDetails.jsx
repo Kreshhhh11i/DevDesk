@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 import {
@@ -8,10 +7,12 @@ import {
   deleteMember,
 } from "../services/teamService";
 import TeamDetailsCard from "../components/TeamDetailsCard";
+import { NotificationContext } from "../context/NotificationContext";
 
 function TeamDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showNotification } = useContext(NotificationContext);
 
   const { data, loading, error } = useFetch(getMemberById, [id]);
 
@@ -62,8 +63,10 @@ function TeamDetails() {
     try {
       await updateMember(id, formdata);
       setIsEditing(false);
+       showNotification("member updated successfully","success")
       navigate(0);
     } catch (error) {
+         showNotification("cannot update member","error")
       setMessage("Failed to update team member.");
     } finally {
       setIsSaving(false);
@@ -100,9 +103,11 @@ function TeamDetails() {
       setIsDeleteModalOpen(false);
 
       // Change this path if your team listing route differs.
+      showNotification("member deleted successfully","success")
       navigate("/team/members");
     } catch (error) {
       setMessage("Failed to delete team member. Please try again.");
+       showNotification("member not deleted","error")
     } finally {
       setIsDeleting(false);
     }
@@ -142,8 +147,8 @@ function TeamDetails() {
           <h2 id="delete-modal-title">Delete Team Member?</h2>
 
           <p>
-            Are you sure you want to delete {data.name}?
-            This action cannot be undone.
+            Are you sure you want to delete {data.name}? This action cannot be
+            undone.
           </p>
 
           {message && <p role="alert">{message}</p>}
@@ -156,11 +161,7 @@ function TeamDetails() {
             Cancel
           </button>
 
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={isDeleting}
-          >
+          <button type="button" onClick={handleDelete} disabled={isDeleting}>
             {isDeleting ? "Deleting..." : "Confirm Delete"}
           </button>
         </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { getAllTeam } from "../services/teamService";
 import useFetch from "../hooks/useFetch";
 import { useDebounce } from "../hooks/useDebounce";
@@ -6,6 +6,7 @@ import { useDebounce } from "../hooks/useDebounce";
 import TeamCard from "../components/TeamCard";
 import { Link } from "react-router-dom";
 import Input from "../components/Input";
+import { NotificationContext } from "../context/NotificationContext";
 
 const Team = () => {
   const [search, setSearch] = useState("");
@@ -16,6 +17,7 @@ const Team = () => {
   const { debouncedSearch } = useDebounce(search, 500);
   const [role, setRole] = useState("all");
   const [sort, setSort] = useState("default");
+  const { showNotification } = useContext(NotificationContext);
 
   const filteredTeam = (data?.Team ?? []).filter((t) => {
     return (
@@ -41,6 +43,7 @@ const Team = () => {
       setTotalPages(data.totalPages);
     }
   }, [data]);
+ 
   useEffect(() => {
     console.log(data);
   }, [data]);
