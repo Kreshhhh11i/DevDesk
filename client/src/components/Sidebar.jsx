@@ -9,9 +9,11 @@ const Sidebar = ({ isOpen }) => {
       >
         <Link to="/dashboard">Dashboard</Link>
         <Link to="/tasks">Tasks</Link>
+        <Link to="/team/members">Members</Link>
         <Link to="/profile">Profile</Link>
         <Link to="/notifications">Notifications</Link>
         <Link to="/settings">Settings</Link>
+        
       </div>
     </>
   );
